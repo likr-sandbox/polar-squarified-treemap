@@ -1,12 +1,13 @@
 import { Suspense, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import Node from "./Node";
 import * as d3 from "d3";
 
 function normalizeDistance(root) {
   const scale = d3
     .scaleLinear()
     .domain(d3.extent(root.descendants(), (item) => item.data.data.distance))
-    .range([1000, 0]);
+    .range([500, 0]);
   for (const node of root) {
     node.distance = scale(node.data.data.distance);
   }
@@ -45,6 +46,11 @@ function layout(data) {
   const dataStratify = stratify(data);
   const root = d3.hierarchy(dataStratify);
   normalizeDistance(root);
+  for (const node of root) {
+    node.data.data.WordScore.sort((item1, item2) => item2.score - item1.score);
+  }
+  // aggregateWords(root);
+  // root.data.data.WordScore = root.data.data.TopicScore;
   root.t0 = 0;
   root.r0 = 0;
   const dt = (2 * Math.PI) / root.leaves().length;
@@ -57,26 +63,12 @@ function DendrogramContent({ drawing }) {
   const margin = 10;
   const width = (radius + margin) * 2;
   const height = width;
-  const arc = d3.arc();
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`}>
       <g transform={`translate(${width / 2},${height / 2})`}>
         {drawing.map((item, i) => {
-          return (
-            <g key={i}>
-              <path
-                d={arc({
-                  innerRadius: item.r0,
-                  outerRadius: item.r1,
-                  startAngle: item.t0,
-                  endAngle: item.t1,
-                })}
-                fill="none"
-                stroke="#888"
-              />
-            </g>
-          );
+          return <Node key={i} node={item} />;
         })}
       </g>
     </svg>
@@ -87,7 +79,7 @@ function Dendrogram() {
   const { data } = useQuery({
     queryKey: ["data"],
     queryFn: async () => {
-      const response = await fetch("data/visdata220905.json");
+      const response = await fetch("data/visdata221109v2.json");
       return response.json();
     },
   });
