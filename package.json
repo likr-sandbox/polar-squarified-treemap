@@ -1,5 +1,5 @@
 {
-  "name": "vite-react",
+  "name": "polar-squarified-treemap",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.14.5",
+    "d3": "^7.6.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
